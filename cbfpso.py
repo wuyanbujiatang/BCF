@@ -27,13 +27,13 @@ class PSO(object):
         self.x = np.random.uniform(self.x0_bound[0], self.x0_bound[1],  
                                    (self.population_size, self.dim))  # 初始化粒子群位置
         self.x[:,1] = self.x1_bound[1]/self.x0_bound[1]*self.x[:,1] # 初始化粒子群位置
-        preset_x = np.array([[0,0],[np.pi/8,0],[3*np.pi/8,np.pi/2],[3*np.pi/8,3*np.pi/2],
+        preset_x = np.array([[0,0],[np.pi/8,0],[3*np.pi/8,0.01],[0,0.01],
                   [np.pi/4,0],[np.pi/4,np.pi/4],[np.pi/4,np.pi/2],[np.pi/4,3*np.pi/4],[np.pi/4,np.pi],[np.pi/4,5*np.pi/4],[np.pi/4,3*np.pi/2],[np.pi/4,7*np.pi/4],
                   [np.pi/2,0],[np.pi/2,np.pi/4],[np.pi/2,np.pi/2],[np.pi/2,3*np.pi/4],[np.pi/2,np.pi],[np.pi/2,5*np.pi/4],[np.pi/2,3*np.pi/2],[np.pi/2,7*np.pi/4]]).reshape(20,2)
         self.x[0:len(preset_x),:] = preset_x
         self.v0_bound = [-0.25,0.25]
         self.v1_bound = [-1,1]
-        self.v = self.v0_bound[1]*np.random.rand(self.population_size, self.dim)  # 初始化粒子群速度
+        self.v = self.v0_bound[1]*(2*np.random.rand(self.population_size, self.dim)-1)  # 初始化粒子群速度
         self.v[:,1] = self.v1_bound[1]/self.v0_bound[1]*self.v[:,1] # 初始化粒子群速度
         
         fitness = self.calculate_fitness(self.x)  
