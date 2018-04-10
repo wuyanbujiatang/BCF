@@ -20,9 +20,9 @@ class Array(object):
         alpha_N = 100
         B = []
         for sita in range(sita_N):
-            sita = sita*np.pi/2/sita_N
+            sita = sita*np.pi/sita_N
             for alpha in range(alpha_N):
-                alpha = alpha*2*np.pi/alpha_N
+                alpha = alpha*np.pi/alpha_N
                 bf = 0 + 0.j
                 for coor in self.__coors:
                     d = coor[0]*np.sin(sita)*np.cos(alpha)+coor[1]*np.sin(sita)*np.sin(alpha)+coor[2]*np.cos(sita)

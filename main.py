@@ -17,10 +17,10 @@ import numpy as np
 import show
 import soundsource
 import ascousticarray as ascarr
-#import beamforming as cbf
+import beamforming as cbf
 import cbfpso
 if __name__ == '__main__':
-    m_Sound_1st = soundsource.Sound(0.001,10000,np.pi,np.pi/4,1,500)
+    m_Sound_1st = soundsource.Sound(0.001,10000,np.pi/4,np.pi/4,1,500)
     t1,signal1,alpha1,sita1,c = m_Sound_1st.generate()
     m_Sound_2st = soundsource.Sound(0.01,10000,np.pi,0.5*np.pi/4,1,0,0)
     t2,signal2,alpha2,sita2,c = m_Sound_2st.generate()
@@ -29,12 +29,12 @@ if __name__ == '__main__':
     
     m_Array = ascarr.Array([0,0,0])
     m_Array.add_coors([[-0.4,0,0],[-0.2,0,0],[0.2,0,0],[0.4,0,0]])
-    m_Array.add_coors([[0,-0.4,0],[0,-0.2,0],[0,0.2,0],[0,0.4,0]])
+    m_Array.add_coors([[0,0,-0.4],[0,0,-0.2],[0,0,0.2],[0,0,0.4]])
     B = np.array(m_Array.get_H(342,5e2))
-#    alpha = list(B[:,1])
-#    sita = list(B[:,2])
-#    result = list(B[:,0])
-#    show.show_3D_result(alpha,sita,result)
+    alpha = list(B[:,1])
+    sita = list(B[:,2])
+    result = list(B[:,0])
+    show.show_3D_result(alpha,sita,result)
     
     down_fs = 20000
     t,sound1 = m_Array.get_response(t1,signal1,alpha1,sita1,c,down_fs)
@@ -42,17 +42,17 @@ if __name__ == '__main__':
     sound = sound1 + sound2
     show.show_all_received(t,sound)
     
-    pso = cbfpso.PSO(20,100,t,sound,0.2)  
+    pso = cbfpso.PSO(25,40,t,sound,0.2)  
     pg = pso.evolve()
     print('alpha = ',pg[1])
     print('sita = ',pg[0])
 #    m_CBF = cbf.CBF(t,sound,m_Array.get_coors())
-##    orientation_result = np.array(m_CBF.get_orientation())
-#    orientation_result = np.array(m_CBF.get_cross_orientation(0.2))
+#    orientation_result = np.array(m_CBF.get_orientation())
+##    orientation_result = np.array(m_CBF.get_cross_orientation(0.2))
 #    row,column = np.shape(orientation_result)
-#    alpha = list(orientation_result[:,1][0:int(row/2)])
-#    sita = list(orientation_result[:,2][0:int(row/2)])
-#    result = list(orientation_result[:,0][0:int(row/2)])
+#    alpha = list(orientation_result[:,1])
+#    sita = list(orientation_result[:,2])
+#    result = list(orientation_result[:,0])
 #    show.show_result(result)
 #    show.show_3D_result(alpha,sita,result)
 #    pos_index = result.index(max(result))

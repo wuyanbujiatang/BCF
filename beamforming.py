@@ -15,9 +15,9 @@ class CBF(object):
         self.__acoustic_array = acoustic_array
         self.__c = 342
     def get_orientation(self):
-        alpha_N = 100
-        sita_N = 100
-        alpha_arr = np.linspace(0,2*np.pi,num=alpha_N)
+        alpha_N = 50
+        sita_N = 50
+        alpha_arr = np.linspace(0,np.pi,num=alpha_N)
         sita_arr = np.linspace(0,np.pi,num=sita_N)
         result = []
         for sita in sita_arr:
@@ -45,28 +45,115 @@ class CBF(object):
                 result.append([sum([abs(cell) for cell in compound]),alpha,sita])
         return result
     def get_cross_orientation(self,d):
-        alpha_N = 40
-        sita_N = 10
-        alpha_arr = np.linspace(0,2*np.pi,num=alpha_N)
+        alpha_N = 20
+        sita_N = 20
+        alpha_arr = np.linspace(0,np.pi,num=alpha_N)
         sita_arr = np.linspace(0,np.pi,num=sita_N)
+        fusai = d/self.__c/(self.__t[1]-self.__t[0])
         result = []
         for sita in sita_arr:
-            fusai = np.sin(sita)*d/self.__c
+            sin_sita = np.sin(sita)
+            cos_sita = np.cos(sita)
             for alpha in alpha_arr:
-                sin_alpha = np.sin(alpha)
                 cos_alpha = np.cos(alpha)
                 tao = [0]
-                tao.append(-2*fusai*cos_alpha)
-                tao.append(-fusai*cos_alpha)
-                tao.append(fusai*cos_alpha)
-                tao.append(2*fusai*cos_alpha)
-                tao.append(-2*fusai*sin_alpha)
-                tao.append(-fusai*sin_alpha)
-                tao.append(fusai*sin_alpha)
-                tao.append(2*fusai*sin_alpha)
+                tao.append(-2*fusai*sin_sita*cos_alpha)
+                tao.append(-fusai*sin_sita*cos_alpha)
+                tao.append(fusai*sin_sita*cos_alpha)
+                tao.append(2*fusai*sin_sita*cos_alpha)
+                tao.append(-2*fusai*cos_sita)
+                tao.append(-fusai*cos_sita)
+                tao.append(fusai*cos_sita)
+                tao.append(2*fusai*cos_sita)
                 compound = np.zeros((len(self.__t),1))
                 for m in range(len(self.__acoustic_array)):
-                    dn = int(round(tao[m]/(self.__t[1]-self.__t[0])))
+                    dn = int(round(tao[m]))
+                    if dn>0:
+                        plus_elements = np.zeros((dn,1))
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = signal[dn:]
+                        componnent = np.vstack((componnent,plus_elements))
+                    elif dn < 0:
+                        plus_elements = np.zeros((-dn,1))
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = np.vstack((plus_elements,signal))
+                        componnent = componnent[0:len(self.__t)]
+                    else:
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = signal
+                    compound = compound + componnent
+                result.append([sum([abs(cell) for cell in compound]),alpha,sita])
+        return result
+    def get_cross_orientation_v2(self,d):
+        alpha_N = 20
+        sita_N = 20
+        alpha_arr = np.linspace(0,np.pi,num=alpha_N)
+        sita_arr = np.linspace(0,np.pi,num=sita_N)
+        fusai = d/self.__c/(self.__t[1]-self.__t[0])
+        result = []
+        for sita in sita_arr:
+            sin_sita = np.sin(sita)
+            cos_sita = np.cos(sita)
+            for alpha in alpha_arr:
+                cos_alpha = np.cos(alpha)
+                tao = [0]
+                tao.append(-2*fusai*sin_sita*cos_alpha)
+                tao.append(-fusai*sin_sita*cos_alpha)
+                tao.append(fusai*sin_sita*cos_alpha)
+                tao.append(2*fusai*sin_sita*cos_alpha)
+                tao.append(-2*fusai*cos_sita)
+                tao.append(-fusai*cos_sita)
+                tao.append(fusai*cos_sita)
+                tao.append(2*fusai*cos_sita)
+                compound = np.zeros((len(self.__t),1))
+                for m in range(len(self.__acoustic_array)):
+                    dn = int(round(tao[m]))
+                    if dn>0:
+                        plus_elements = np.zeros((dn,1))
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = signal[dn:]
+                        componnent = np.vstack((componnent,plus_elements))
+                    elif dn < 0:
+                        plus_elements = np.zeros((-dn,1))
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = np.vstack((plus_elements,signal))
+                        componnent = componnent[0:len(self.__t)]
+                    else:
+                        signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
+                        componnent = signal
+                    compound = compound + componnent
+                result.append([sum([abs(cell) for cell in compound]),alpha,sita])
+        orientation_result = np.array(result)
+        row,column = np.shape(orientation_result)
+        alpha_arr = list(orientation_result[:,1])
+        sita_arr = list(orientation_result[:,2])
+        result = list(orientation_result[:,0])
+        pos_index = result.index(max(result))
+        get_sita = sita_arr[pos_index]
+        get_alpha = alpha_arr[pos_index]
+        alpha_N = 10
+        sita_N = 10
+        alpha_arr = np.linspace(get_alpha-np.pi/20,get_alpha+np.pi/20,num=alpha_N)
+        sita_arr = np.linspace(get_sita-np.pi/20,get_sita+np.pi/20,num=sita_N)
+        fusai = d/self.__c/(self.__t[1]-self.__t[0])
+        result = []
+        for sita in sita_arr:
+            sin_sita = np.sin(sita)
+            cos_sita = np.cos(sita)
+            for alpha in alpha_arr:
+                cos_alpha = np.cos(alpha)
+                tao = [0]
+                tao.append(-2*fusai*sin_sita*cos_alpha)
+                tao.append(-fusai*sin_sita*cos_alpha)
+                tao.append(fusai*sin_sita*cos_alpha)
+                tao.append(2*fusai*sin_sita*cos_alpha)
+                tao.append(-2*fusai*cos_sita)
+                tao.append(-fusai*cos_sita)
+                tao.append(fusai*cos_sita)
+                tao.append(2*fusai*cos_sita)
+                compound = np.zeros((len(self.__t),1))
+                for m in range(len(self.__acoustic_array)):
+                    dn = int(round(tao[m]))
                     if dn>0:
                         plus_elements = np.zeros((dn,1))
                         signal = copy.copy(self.__sound[:,m]).reshape(len(self.__t),1)
