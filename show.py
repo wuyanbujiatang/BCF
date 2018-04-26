@@ -6,6 +6,8 @@ Created on Fri Apr  6 17:17:26 2018
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 #from mpl_toolkits.mplot3d import axes3d
 from mpl_toolkits.mplot3d import Axes3D
 def show_all_received(t,x):
@@ -25,11 +27,13 @@ def show_3D_result(alpha,sita,result):
     fig=plt.figure(figsize=(8,6))
 #    axes = fig.gca(projection='3d')
     axes=fig.add_subplot(111,projection='3d')
-    axes.scatter(alpha,sita,result,s=1,c='r')
-    axes.set_xlabel(u'alpha(rad)')
-    axes.set_ylabel(u'sita(rad)')
+#    axes.scatter(alpha,sita,result,s=1,c='r')
+#    axes.plot_wireframe(alpha, sita, result, rstride=10, cstride=10)
+    axes.plot_trisurf(alpha, sita, result, linewidth=0.1, antialiased=True) 
+    axes.set_xlabel(u'alpha')
+    axes.set_ylabel(u'sita')
     axes.set_zlabel(u'result')
-    axes.set_title('sound pursuit result')
+    axes.set_title('Localization result of sound source')
     plt.show()
     
 def show_result(x):

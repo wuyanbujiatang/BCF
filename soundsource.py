@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr  6 20:00:15 2018
-
+sigma,N,alpha,sita,amp,*f_set分别为噪声标准差，采样点数，方位角，仰角，幅度，频率
 @author: wsj
 """
 import math
@@ -16,14 +16,15 @@ class Sound(object):
         self.__alpha = alpha
         self.__amp = amp
         self.__sigma = sigma
-        self.__fs = 1e6
+        self.__fs = 1e4
         self.__c = 342
     def generate(self):
         t = np.linspace(0,self.__N/self.__fs,num=self.__N)
         signal = np.zeros((self.__N,1))
+        fai = random.uniform(0,2*np.pi)
         for f in self.__f_set:
             rad = [2*math.pi*f*n/self.__fs for n in range(self.__N)]
-            component = np.array([self.__amp*math.sin(i) for i in rad]).reshape(self.__N,1)
+            component = np.array([self.__amp*math.sin(i+fai) for i in rad]).reshape(self.__N,1)
             signal  = signal + component
         noise = np.array([random.gauss(0,self.__sigma) for i in range(self.__N)]).reshape(self.__N,1)
         signal = signal + noise
